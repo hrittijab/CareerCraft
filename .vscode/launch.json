@@ -1,0 +1,42 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "FastAPI (uvicorn)",
+      "type": "python",
+      "request": "launch",
+      "module": "uvicorn",
+      "args": ["app.main:app", "--reload", "--port", "8000"],
+      "cwd": "${workspaceFolder}\\backend",
+      "envFile": "${workspaceFolder}\\backend\\.env",
+      "console": "integratedTerminal",
+      "justMyCode": true
+    },
+    {
+      "name": "Angular (ng serve)",
+      "type": "pwa-node",
+      "request": "launch",
+      "cwd": "${workspaceFolder}\\frontend\\careercraft",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "start"],
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "Chrome: Angular app",
+      "type": "pwa-chrome",
+      "request": "launch",
+      "url": "http://localhost:4200",
+      "webRoot": "${workspaceFolder}\\frontend\\careercraft"
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Dev: API + Angular + Browser",
+      "configurations": [
+        "FastAPI (uvicorn)",
+        "Angular (ng serve)",
+        "Chrome: Angular app"
+      ]
+    }
+  ]
+}
