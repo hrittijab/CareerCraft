@@ -1,2 +1,12 @@
+# Python
+backend/.venv/
 backend/__pycache__/
 *.pyc
+
+# Angular
+frontend/careercraft/node_modules/
+frontend/careercraft/dist/
+frontend/careercraft/.angular/
+
+# Env / local
+backend/.env
