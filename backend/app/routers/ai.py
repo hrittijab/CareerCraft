@@ -4,6 +4,8 @@ import PyPDF2
 from docx import Document
 import pytesseract
 from pdf2image import convert_from_bytes
+from app.services.ats_scoring import ats_score
+
 
 router = APIRouter()
 
@@ -144,6 +146,23 @@ def recommend_skills(data: RecommendationRequest):
         return {"error": str(e)}
 
 
+@router.post("/ats-score")
+def ats_score_endpoint(data: JobFitRequest):
+    skills_list = [
+        "python", "java", "c++", "javascript", "react",
+        "fastapi", "flask", "django",
+        "aws", "azure", "gcp",
+        "docker", "kubernetes",
+        "sql", "postgresql", "mongodb", "dynamodb",
+        "tensorflow", "pytorch",
+        "nlp", "machine learning", "deep learning"
+    ]
+
+    return ats_score(
+        resume=data.resume,
+        jd=data.job_description,
+        skills_list=skills_list
+    )
 
 
 @router.post("/resume-optimizer")
