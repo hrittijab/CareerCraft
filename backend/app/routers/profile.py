@@ -4,4 +4,4 @@ router = APIRouter()
 
 @router.get("/ping")
 def ping():
-    return {"status": "Profile service up ✅"}
+    return {"status": "Profile service up "}
