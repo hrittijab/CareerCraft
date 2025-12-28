@@ -105,28 +105,34 @@ def ats_score(resume: str, jd: str, skills_list: list) -> dict:
 
     sections = split_sections(resume)
 
-    keywords, importance = extract_keywords_from_jd(jd, top_n=40)
+    all_keywords, importance = extract_keywords_from_jd(jd, top_n=40)
 
-    cover_hits = 0
+    def is_meaningful_keyword(k):
+        return k in skills_list or len(k) >= 4
+
+    keywords = [k for k in all_keywords if is_meaningful_keyword(k)]
+
+    cover_hits = 0.0
     imp_hit_sum = 0.0
-    imp_sum = sum(importance.values()) or 1.0
+    imp_sum = sum(importance.get(k, 0) for k in keywords) or 1.0
 
     matched = []
     missing = []
 
     for k in keywords:
-        pw = presence_weighted(sections, k)  # 0, 0.8, 1.0, 1.1, 1.3
+        pw = presence_weighted(sections, k)
         if pw > 0:
-            cover_hits += 1
+            weighted_pw = min(pw / 1.3, 1.0)
+            cover_hits += weighted_pw
             matched.append(k)
-            imp_hit_sum += importance[k] * min(pw / 1.3, 1.0)  #normalize to <= 1
+            imp_hit_sum += importance.get(k, 0) * weighted_pw
         else:
             missing.append(k)
 
     coverage = cover_hits / (len(keywords) or 1)
     importance_match = imp_hit_sum / imp_sum
 
-    def norm_skill(s): 
+    def norm_skill(s):
         s = normalize(s)
         return SKILL_SYNONYMS.get(s, s)
 
@@ -139,25 +145,23 @@ def ats_score(resume: str, jd: str, skills_list: list) -> dict:
         if ns in resume_n:
             resume_skills.add(ns)
 
-    skills_match = (len(jd_skills & resume_skills) / (len(jd_skills) or 1))
+    skills_match = len(jd_skills & resume_skills) / (len(jd_skills) or 1)
 
-    #role similarity
     role_sim = cosine_role_similarity(resume, jd)
-
-    #penalty
     penalty = keyword_stuffing_penalty(resume, keywords)
 
-    #weighted final score
     raw = (
-        35 * coverage +
+        30 * coverage +
         30 * importance_match +
-        25 * skills_match +
+        30 * skills_match +
         10 * role_sim
     )
+
     final = max(0.0, min(100.0, raw - penalty))
 
-    #rank missing by importance
-    top_missing = sorted(missing, key=lambda k: importance.get(k, 0), reverse=True)[:10]
+    top_missing = sorted(
+        missing, key=lambda k: importance.get(k, 0), reverse=True
+    )[:10]
 
     return {
         "ats_score": round(final, 2),
@@ -175,3 +179,4 @@ def ats_score(resume: str, jd: str, skills_list: list) -> dict:
             for k in top_missing[:5]
         ],
     }
+

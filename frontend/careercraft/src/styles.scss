@@ -1,1 +1,290 @@
-/* You can add global styles to this file, and also import other style files */
+/* -------- RESET -------- */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background-attachment: fixed;
+  color: #0f172a;
+  min-height: 100vh;
+}
+
+/* -------- HEADER -------- */
+header {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(229, 231, 235, 0.5);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  transition: all 0.3s ease;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px 24px;
+}
+
+header .container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.logo {
+  font-weight: 800;
+  font-size: 24px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -0.5px;
+  transition: transform 0.2s ease;
+  cursor: pointer;
+}
+
+.logo:hover {
+  transform: scale(1.05);
+}
+
+/* -------- NAVIGATION -------- */
+nav {
+  display: flex;
+  gap: 8px;
+}
+
+nav a {
+  text-decoration: none;
+  color: #64748b;
+  font-weight: 600;
+  font-size: 15px;
+  padding: 10px 20px;
+  border-radius: 12px;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+nav a:hover {
+  color: #667eea;
+  background: rgba(102, 126, 234, 0.08);
+}
+
+nav a.active {
+  color: #667eea;
+  background: rgba(102, 126, 234, 0.12);
+}
+
+nav a.active::after {
+  content: '';
+  position: absolute;
+  bottom: 6px;
+  left: 20px;
+  right: 20px;
+  height: 2px;
+  background: #667eea;
+  border-radius: 2px;
+}
+
+/* -------- MAIN CONTENT -------- */
+main.container {
+  padding: 48px 24px;
+}
+
+/* -------- UI PRIMITIVES -------- */
+.card {
+  background: white;
+  border-radius: 24px;
+  padding: 32px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+  margin-bottom: 24px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.12);
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+@media (max-width: 900px) {
+  .row {
+    grid-template-columns: 1fr;
+  }
+
+  nav {
+    gap: 4px;
+  }
+
+  nav a {
+    padding: 8px 12px;
+    font-size: 14px;
+  }
+
+  nav a.active::after {
+    left: 12px;
+    right: 12px;
+  }
+}
+
+/* -------- TEXT -------- */
+h1 {
+  font-size: 48px;
+  font-weight: 900;
+  margin: 0 0 16px 0;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+h2 {
+  margin-top: 0;
+  margin-bottom: 24px;
+  font-size: 28px;
+  font-weight: 800;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+h3 {
+  margin: 0 0 12px 0;
+  font-size: 20px;
+  color: #1e293b;
+}
+
+p {
+  line-height: 1.6;
+  color: #64748b;
+}
+
+label {
+  font-weight: 600;
+  margin-bottom: 8px;
+  display: block;
+  color: #334155;
+  font-size: 14px;
+}
+
+/* -------- INPUTS -------- */
+textarea,
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+select {
+  width: 100%;
+  padding: 14px 16px;
+  border-radius: 14px;
+  border: 2px solid #e2e8f0;
+  resize: vertical;
+  font-family: inherit;
+  font-size: 15px;
+  transition: all 0.2s ease;
+  background: #f8fafc;
+}
+
+textarea:focus,
+input:focus,
+select:focus {
+  outline: none;
+  border-color: #667eea;
+  background: white;
+  box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+}
+
+/* -------- BUTTONS -------- */
+.btn,
+button {
+  border-radius: 14px;
+  padding: 12px 24px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 15px;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: inherit;
+}
+
+.primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.primary:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+}
+
+.primary:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.secondary {
+  background: #f1f5f9;
+  color: #475569;
+}
+
+.secondary:hover:not(:disabled) {
+  background: #e2e8f0;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* -------- TAGS -------- */
+.tag {
+  padding: 8px 16px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+  color: #667eea;
+  display: inline-block;
+}
+
+/* -------- UTILITY CLASSES -------- */
+.text-center {
+  text-align: center;
+}
+
+.mt-24 {
+  margin-top: 24px;
+}
+
+.mb-24 {
+  margin-bottom: 24px;
+}
+
+.flex {
+  display: flex;
+}
+
+.flex-gap-12 {
+  gap: 12px;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.justify-between {
+  justify-content: space-between;
+}

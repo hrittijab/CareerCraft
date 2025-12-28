@@ -4,7 +4,7 @@ import PyPDF2
 from docx import Document
 import pytesseract
 from pdf2image import convert_from_bytes
-from app.services.ats_scoring import ats_score
+from backend.app.services.ats_scoring import ats_score
 
 
 router = APIRouter()
