@@ -2,139 +2,172 @@ from fastapi import APIRouter
 from pydantic import BaseModel
 from huggingface_hub import InferenceClient
 
+MAX_CHARS = 2000
+DEFAULT_TEMP = 0.6
+
 router = APIRouter()
 
-
 client = InferenceClient(
-    model="mistralai/Mistral-7B-Instruct-v0.2"
+    model="mistralai/Mistral-7B-Instruct-v0.2",
+    timeout=60
 )
 
-def call_huggingface(prompt: str, max_tokens: int = 300):
+
+def truncate(text: str, limit: int = MAX_CHARS) -> str:
+    return text[:limit].strip()
+
+
+def call_huggingface(prompt: str, max_tokens: int):
     try:
         response = client.chat_completion(
-            messages=[
-                {"role": "user", "content": prompt}
-            ],
+            messages=[{"role": "user", "content": prompt}],
             max_tokens=max_tokens,
-            temperature=0.7
+            temperature=DEFAULT_TEMP,
         )
-        return {
-            "text": response.choices[0].message.content.strip()
-        }
+        return response.choices[0].message.content.strip()
     except Exception as e:
-        return {"error": str(e)}
+        return f"Error generating response: {str(e)}"
 
 
 class CoverLetterRequest(BaseModel):
     resume: str
     job_description: str
 
+
 class JobDescriptionRequest(BaseModel):
     job_description: str
+
 
 class AdviceRequest(BaseModel):
     resume: str
     job_description: str
 
+
 class InterviewQuestionRequest(BaseModel):
     resume: str
     job_description: str
 
+
 class BulletRequest(BaseModel):
     text: str
+
 
 class ResumeTextRequest(BaseModel):
     text: str
 
 
-
 @router.post("/cover-letter")
 def generate_cover_letter(data: CoverLetterRequest):
+    resume = truncate(data.resume)
+    jd = truncate(data.job_description)
+
     prompt = f"""
-Write a professional and concise cover letter.
+Write a COMPLETE, professional cover letter with:
+- 1 introduction
+- 2 concise body paragraphs
+- 1 closing paragraph
+- a polite sign-off
+
+Do not stop mid-sentence.
 
 Resume:
-{data.resume}
+{resume}
 
 Job Description:
-{data.job_description}
+{jd}
 """
-    result = call_huggingface(prompt)
-    return {"cover_letter": result.get("text") or result}
+
+    text = call_huggingface(prompt, max_tokens=900)
+    return {"cover_letter": text}
 
 
 @router.post("/interview-questions")
 def generate_interview_questions(data: JobDescriptionRequest):
+    jd = truncate(data.job_description)
+
     prompt = f"""
-Generate 5 technical interview questions for the following job description:
+Generate exactly 5 technical interview questions
+based on this job description.
 
-{data.job_description}
+Return each question on a new line.
+
+Job Description:
+{jd}
 """
-    result = call_huggingface(prompt, max_tokens=200)
 
-    if "text" in result:
-        questions = [q.strip("-• ") for q in result["text"].split("\n") if q.strip()]
-        return {"questions": questions[:5]}
-    return result
+    text = call_huggingface(prompt, max_tokens=400)
+    questions = [q.strip("-• ") for q in text.split("\n") if q.strip()]
+
+    return {"questions": questions[:5]}
 
 
 @router.post("/interview-questions-advanced")
 def interview_questions_advanced(data: InterviewQuestionRequest):
+    resume = truncate(data.resume, 1500)
+    jd = truncate(data.job_description, 1500)
+
     prompt = f"""
 You are an interviewer.
 
-Based on the candidate's resume and the job description, generate:
-- 3 technical interview questions
+Generate:
+- 3 technical questions
 - 1 behavioral question
-- 1 resume-specific follow-up question
+- 1 resume-specific follow-up
 
 Resume:
-{data.resume}
+{resume}
 
 Job Description:
-{data.job_description}
+{jd}
 """
-    result = call_huggingface(prompt, max_tokens=250)
 
-    if "text" in result:
-        questions = [q.strip("-• ") for q in result["text"].split("\n") if q.strip()]
-        return {"questions": questions[:5]}
-    return result
+    text = call_huggingface(prompt, max_tokens=500)
+    questions = [q.strip("-• ") for q in text.split("\n") if q.strip()]
+
+    return {"questions": questions[:5]}
 
 
 @router.post("/career-advice")
 def generate_career_advice(data: AdviceRequest):
+    resume = truncate(data.resume)
+    jd = truncate(data.job_description)
+
     prompt = f"""
-Provide personalized career advice for a candidate with the following resume
-who is applying for the given job.
+Provide concise, actionable career advice for a candidate.
 
 Resume:
-{data.resume}
+{resume}
 
 Job Description:
-{data.job_description}
+{jd}
 """
-    result = call_huggingface(prompt)
-    return {"advice": result.get("text") or result}
+
+    text = call_huggingface(prompt, max_tokens=500)
+    return {"advice": text}
 
 
 @router.post("/improve-bullet")
 def improve_bullet(data: BulletRequest):
     prompt = f"""
-Rewrite the following resume bullet point to be more achievement-focused,
-quantified, and impact-driven.
+Rewrite this resume bullet to be:
+- achievement-focused
+- quantified
+- concise (1–2 lines)
 
-Bullet point:
+Bullet:
 {data.text}
 """
-    result = call_huggingface(prompt, max_tokens=150)
-    return {"improved_bullet": result.get("text") or result}
+
+    text = call_huggingface(prompt, max_tokens=150)
+    return {"improved_bullet": text}
 
 
 @router.post("/resume-structure")
 def resume_structure(data: ResumeTextRequest):
+    text = truncate(data.text, 2500)
+
     prompt = f"""
-Extract the following fields from this resume and return them as JSON:
+Extract and return the following fields as VALID JSON:
 - Skills
 - Education
 - Work Experience
@@ -142,7 +175,8 @@ Extract the following fields from this resume and return them as JSON:
 - Certifications
 
 Resume:
-{data.text}
+{text}
 """
-    result = call_huggingface(prompt, max_tokens=300)
-    return {"structured_resume": result.get("text") or result}
+
+    structured = call_huggingface(prompt, max_tokens=400)
+    return {"structured_resume": structured}

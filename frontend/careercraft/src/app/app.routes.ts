@@ -1,33 +1,71 @@
 import { Routes } from '@angular/router';
 
-import { HomePage } from './pages/home.page';
-import { CoverLetterPage } from './pages/cover-letter.page';
-import { AtsScorePage } from './pages/ats-score.page';
-import { HistoryPage } from './pages/history.page';
-import { CareerAdvicePage } from './pages/career-advice.page';
-import { InterviewQuestionsPage } from './pages/interview-questions.page';
-import { JobFitPage } from './pages/job-fit.page';
-import { ResumeParserPage } from './pages/resume-parser.page';
-import { SkillGapPage } from './pages/skill-gap.page';
-import { BulletImprovePage } from './pages/bullet-improve.page';
-import { SkillRecommendPage } from './pages/skill-recommend.page';
-
 export const routes: Routes = [
-  { path: '', component: HomePage },
+  {
+    path: '',
+    loadComponent: () =>
+      import('./pages/home.page').then(m => m.HomePage)
+  },
 
-  { path: 'cover-letter', component: CoverLetterPage },
-  { path: 'ats-score', component: AtsScorePage },
-  { path: 'career-advice', component: CareerAdvicePage },
-  { path: 'interview-questions', component: InterviewQuestionsPage },
-  { path: 'job-fit', component: JobFitPage },
-  { path: 'resume-parser', component: ResumeParserPage },
-  { path: 'skill-gap', component: SkillGapPage },
+  {
+    path: 'cover-letter',
+    loadComponent: () =>
+      import('./pages/cover-letter.page').then(m => m.CoverLetterPage)
+  },
 
-  { path: 'improve-bullet', component: BulletImprovePage },
-  { path: 'skill-recommendation', component: SkillRecommendPage },
+  {
+    path: 'ats-score',
+    loadComponent: () =>
+      import('./pages/ats-score.page').then(m => m.AtsScorePage)
+  },
 
-  { path: 'history', component: HistoryPage },
+  {
+    path: 'career-advice',
+    loadComponent: () =>
+      import('./pages/career-advice.page').then(m => m.CareerAdvicePage)
+  },
 
-  // Fallback
+  {
+    path: 'interview-questions',
+    loadComponent: () =>
+      import('./pages/interview-questions.page').then(m => m.InterviewQuestionsPage)
+  },
+
+  {
+    path: 'job-fit',
+    loadComponent: () =>
+      import('./pages/job-fit.page').then(m => m.JobFitPage)
+  },
+
+  {
+    path: 'resume-parser',
+    loadComponent: () =>
+      import('./pages/resume-parser.page').then(m => m.ResumeParserPage)
+  },
+
+  {
+    path: 'skill-gap',
+    loadComponent: () =>
+      import('./pages/skill-gap.page').then(m => m.SkillGapPage)
+  },
+
+  {
+    path: 'improve-bullet',
+    loadComponent: () =>
+      import('./pages/bullet-improve.page').then(m => m.BulletImprovePage)
+  },
+
+  {
+    path: 'skill-recommendation',
+    loadComponent: () =>
+      import('./pages/skill-recommend.page').then(m => m.SkillRecommendPage)
+  },
+
+  {
+    path: 'history',
+    loadComponent: () =>
+      import('./pages/history.page').then(m => m.HistoryPage)
+  },
+
   { path: '**', redirectTo: '' }
 ];

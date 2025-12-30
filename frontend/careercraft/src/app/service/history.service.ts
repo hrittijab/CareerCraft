@@ -1,16 +1,26 @@
 import { Injectable } from '@angular/core';
 
+export interface HistoryItem {
+  title: string;
+  type: string;
+  timestamp: number;
+}
+
 @Injectable({ providedIn: 'root' })
 export class HistoryService {
-  private key = 'career-history';
+  private KEY = 'careercraft-history';
 
-  save(item: any) {
-    const data = this.get();
-    data.push(item);
-    localStorage.setItem(this.key, JSON.stringify(data));
+  get(): HistoryItem[] {
+    return JSON.parse(localStorage.getItem(this.KEY) || '[]');
   }
 
-  get() {
-    return JSON.parse(localStorage.getItem(this.key) || '[]');
+  add(item: HistoryItem) {
+    const history = this.get();
+    history.unshift(item);
+    localStorage.setItem(this.KEY, JSON.stringify(history));
+  }
+
+  clear() {
+    localStorage.removeItem(this.KEY);
   }
 }

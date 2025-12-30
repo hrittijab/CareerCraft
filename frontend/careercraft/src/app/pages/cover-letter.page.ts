@@ -2,6 +2,7 @@ import { Component, ChangeDetectorRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ApiService } from '../service/api.service';
+import { HistoryService } from '../service/history.service';
 
 @Component({
   standalone: true,
@@ -29,7 +30,7 @@ import { ApiService } from '../service/api.service';
         (click)="generate()"
         [disabled]="loading"
       >
-        {{ loading ? 'Generating…' : 'Generate' }}
+        {{ loading ? 'Generating…' : 'Generate Cover Letter' }}
       </button>
 
       <!-- Loading -->
@@ -58,6 +59,7 @@ export class CoverLetterPage {
 
   constructor(
     private api: ApiService,
+    private history: HistoryService,
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -73,11 +75,24 @@ export class CoverLetterPage {
     this.api.generateCoverLetter({
       resume: this.resume,
       job_description: this.job
-    }).subscribe(res => {
-      this.result = res.cover_letter;
-      this.loading = false;
+    }).subscribe({
+      next: (res) => {
+        this.result = res.cover_letter;
 
-      this.cdr.detectChanges();
+        this.history.add({
+          title: 'Cover Letter Generated',
+          type: 'Cover Letter',
+          timestamp: Date.now()
+        });
+
+        this.loading = false;
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.loading = false;
+        alert('Failed to generate cover letter. Please try again.');
+        this.cdr.detectChanges();
+      }
     });
   }
 }

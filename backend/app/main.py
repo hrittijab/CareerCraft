@@ -3,7 +3,7 @@ load_dotenv()
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from backend.app.routers import auth, profile, ai, llm
+from app.routers import auth, profile, ai, llm
 
 
 

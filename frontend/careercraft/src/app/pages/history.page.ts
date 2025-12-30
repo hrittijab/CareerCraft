@@ -1,23 +1,34 @@
 import { Component } from '@angular/core';
-import { HistoryService } from '../service/history.service';
+import { CommonModule } from '@angular/common';
+import { HistoryService, HistoryItem } from '../service/history.service';
 
 @Component({
   standalone: true,
+  imports: [CommonModule],
   template: `
-  <h2>History</h2>
+    <div class="card">
+      <h2>History</h2>
 
-  <div class="row">
-    <div class="card" *ngFor="let h of history">
-      <h3>{{ h.title }}</h3>
-      <span class="tag">{{ h.type }}</span>
+      <p *ngIf="!history.length" class="muted">
+        No history yet. Run an analysis to see results here.
+      </p>
+
+      <div class="row" *ngIf="history.length">
+        <div class="card" *ngFor="let h of history">
+          <h3>{{ h.title }}</h3>
+          <span class="tag">{{ h.type }}</span>
+          <p class="muted">
+            {{ h.timestamp | date:'short' }}
+          </p>
+        </div>
+      </div>
     </div>
-  </div>
   `
 })
 export class HistoryPage {
-  history = [];
+  history: HistoryItem[] = [];
 
-  constructor(private hs: HistoryService) {
-    this.history = hs.get();
+  constructor(private historyService: HistoryService) {
+    this.history = this.historyService.get();
   }
 }

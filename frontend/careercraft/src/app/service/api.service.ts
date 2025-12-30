@@ -36,7 +36,6 @@ export class ApiService {
     );
   }
 
-  // ================= LLM ROUTES =================
 
   generateCoverLetter(payload: { resume: string; job_description: string }) {
     return this.http.post<any>(
