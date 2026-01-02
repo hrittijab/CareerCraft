@@ -4,6 +4,15 @@ from math import log
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
+def ats_score(resume: str, jd: str, skills_list: list[str]):
+    if not resume.strip() or not jd.strip():
+        return {
+            "ats_score": 0,
+            "skill_match": 0,
+            "role_similarity": 0,
+            "keyword_score": 0,
+            "message": "Empty resume or job description"
+        }
 STOPWORDS = set("""
 a an the and or but if while is are was were be been being
 to of in on for with as by from at into over under
@@ -21,6 +30,9 @@ SKILL_SYNONYMS = {
     "node": "node.js",
     "postgres": "postgresql",
 }
+
+
+
 
 def normalize(text: str) -> str:
     text = text.lower()
@@ -79,10 +91,19 @@ def presence_weighted(resume_sections: dict, keyword: str) -> float:
     return total 
 
 def cosine_role_similarity(resume: str, jd: str) -> float:
+    if not resume.strip() or not jd.strip():
+        return 0.0
+
     vec = TfidfVectorizer(stop_words="english")
-    X = vec.fit_transform([resume, jd])
+
+    try:
+        X = vec.fit_transform([resume, jd])
+    except ValueError:
+        return 0.0
+
     sim = cosine_similarity(X[0], X[1])[0][0]
     return max(0.0, min(1.0, float(sim)))
+
 
 def keyword_stuffing_penalty(resume: str, keywords: list) -> float:
     tokens = tokenize(resume)
