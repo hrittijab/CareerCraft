@@ -81,7 +81,13 @@ careercraft/
 │   │   ├── services/
 │   │   └── main.py
 │   ├── tests/
-│   │   └── test_ats.py
+│   │   ├── test_ats.py
+│   │   ├── test_job_fit.py
+│   │   ├── test_skill_gap.py
+│   │   ├── test_recommend_skills.py
+│   │   ├── test_resume_optimizer.py
+│   │   ├── test_resume_parser.py
+│   │   └── test_cover_letter.py
 │   └── requirements.txt
 │
 ├── frontend/
@@ -159,18 +165,19 @@ Core principles:
 
 ## Backend Tests (Pytest)
 
-Backend tests focus on **correctness, safety, and edge-case handling**.
+Backend tests focus on **correctness, safety, and edge-case handling** across all API endpoints.
 
-### What Is Tested
+### Test Files
 
-- ATS score with valid input
-- Empty resume handling
-- Empty job description handling
-- Both inputs empty (graceful handling)
-- Very short resumes
-- Non-technical job descriptions
-- Extremely long inputs (trimmed safely)
-- ATS score never exceeding 0–100
+| File | Endpoint | What Is Tested |
+|------|----------|----------------|
+| test_ats.py | `/ai/ats-score` | Valid input, empty inputs, short resume, long input, non-technical JD, score bounds |
+| test_job_fit.py | `/ai/job-fit` | Valid input, empty inputs, both empty, long input, score bounds |
+| test_skill_gap.py | `/ai/smart-skill-gap` | Matched/missing skills, empty inputs, full match, no skills in JD |
+| test_recommend_skills.py | `/ai/recommend-skills` | Recommendations returned, no skills in JD, all skills matched |
+| test_resume_optimizer.py | `/ai/resume-optimizer` | Valid input, empty resume, empty job description |
+| test_resume_parser.py | `/ai/parse-resume-advanced` | Invalid file type, empty file |
+| test_cover_letter.py | `/llm/cover-letter` | Valid input, empty inputs, long input, non-technical JD, response format |
 
 ### Why This Matters
 
@@ -181,7 +188,12 @@ These tests ensure no crashes, no invalid scores, and predictable behavior under
 ```bash
 cd backend
 .venv\Scripts\activate
+
+# Run all tests
 python -m pytest -v
+
+# Run a single file
+python -m pytest tests/test_ats.py -v
 ```
 
 ---
@@ -231,7 +243,7 @@ E2E tests cover **full user flows** from the browser through to the API, testing
 
 - **HTTP interception** — all API calls intercepted with `cy.intercept` to control responses
 - **Loading state assertions** — button disabled and loading message visible during requests
-- **Network delay simulation** — `res.setDelay()` forces async states to be testable
+- **Network delay simulation** — `delay` property forces async states to be testable without hitting the real backend
 - **Error handling** — 500 responses verified to trigger correct user-facing alerts
 - **Input validation** — empty and partial inputs verified to block submission
 - **Edge cases** — unsupported file types, empty API result arrays, zero scores
