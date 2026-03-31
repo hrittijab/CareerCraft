@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { AtsScorePage } from './ats-score.page';
-import { ApiService } from '../service/api.service';
+import { ApiService } from '../service/';
 import { of } from 'rxjs';
 import { provideZoneChangeDetection } from '@angular/core';
 

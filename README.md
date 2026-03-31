@@ -17,7 +17,7 @@ Many applicants struggle with:
 - Inefficient interview preparation
 
 CareerCraft was created to:
-- Explain *why* a resume matches or doesn’t
+- Explain *why* a resume matches or doesn't
 - Provide actionable, prioritized feedback
 - Use AI responsibly and transparently
 - Be beginner-friendly while technically sound
@@ -59,7 +59,8 @@ CareerCraft was created to:
 - Angular (standalone components)
 - TypeScript
 - RxJS
-- Karma + Jasmine for testing
+- Karma + Jasmine for unit testing
+- Cypress for E2E testing
 
 ### Backend
 - FastAPI
@@ -72,72 +73,87 @@ CareerCraft was created to:
 ---
 
 ## Project Structure
-
+```
 careercraft/
 ├── backend/
-│ ├── app/
-│ │ ├── routers/
-│ │ ├── services/
-│ │ └── main.py
-│ ├── tests/
-│ │ └── test_ats.py
-│ └── requirements.txt
+│   ├── app/
+│   │   ├── routers/
+│   │   ├── services/
+│   │   └── main.py
+│   ├── tests/
+│   │   └── test_ats.py
+│   └── requirements.txt
 │
 ├── frontend/
-│ └── careercraft/
-│ ├── src/app/pages/
-│ ├── src/app/service/
-│ ├── src/app/app.routes.ts
-│ └── src/app/app.spec.ts
+│   └── careercraft/
+│       ├── src/app/pages/
+│       ├── src/app/service/
+│       ├── src/app/app.routes.ts
+│       └── src/app/app.spec.ts
 │
+├── cypress/
+│   ├── e2e/
+│   │   ├── home.cy.js
+│   │   ├── ats-score.cy.js
+│   │   ├── cover-letter.cy.js
+│   │   ├── job-fit.cy.js
+│   │   ├── skill-gap.cy.js
+│   │   ├── skill-recommendation.cy.js
+│   │   ├── career-advice.cy.js
+│   │   ├── interview-questions.cy.js
+│   │   ├── improve-bullet.cy.js
+│   │   ├── resume-parser.cy.js
+│   │   └── history.cy.js
+│   └── support/
+│       ├── commands.js
+│       └── e2e.js
+├── cypress.config.js
 └── README.md
-
-
+```
 
 ---
 
 ## How to Run the Project
 
 ### Backend
-
+```bash
 cd backend
 python -m venv .venv
 .venv\Scripts\activate
 pip install -r requirements.txt
 uvicorn app.main:app --reload
+```
 
-
-
-Backend runs at:
-http://127.0.0.1:8000
-
-
+Backend runs at: `http://127.0.0.1:8000`
 
 ---
 
 ### Frontend
-
+```bash
 cd frontend/careercraft
 npm install
 ng serve
+```
 
-
-
-Frontend runs at:
-http://localhost:4200
-
-
+Frontend runs at: `http://localhost:4200`
 
 ---
 
 ## Testing Philosophy
 
-CareerCraft follows a **realistic, user-focused testing approach**:
+CareerCraft follows a **realistic, user-focused testing approach** across three layers:
+
+| Layer | Framework | Focus |
+|-------|-----------|-------|
+| Backend unit tests | Pytest | Correctness, edge cases, safety |
+| Frontend unit tests | Karma + Jasmine | Component logic, state, async |
+| E2E tests | Cypress | Full user flows, API integration |
+
+Core principles:
 - Test what users can break
 - Test edge cases before happy paths
-- Avoid meaningless “always green” tests
-
-Backend and frontend are tested independently and together.
+- Avoid meaningless "always green" tests
+- Each layer tests what it is best suited for
 
 ---
 
@@ -159,24 +175,20 @@ Backend tests focus on **correctness, safety, and edge-case handling**.
 ### Why This Matters
 
 Real ATS systems often fail silently.  
-These tests ensure:
-- No crashes
-- No invalid scores
-- Predictable behavior under all conditions
+These tests ensure no crashes, no invalid scores, and predictable behavior under all conditions.
 
 ### Run Backend Tests
-
+```bash
 cd backend
 .venv\Scripts\activate
 python -m pytest -v
-
-
+```
 
 ---
 
-## Frontend Tests (Angular)
+## Frontend Unit Tests (Karma + Jasmine)
 
-Frontend tests focus on **user behavior and UI logic**, not internal implementation.
+Frontend unit tests focus on **component logic and UI behavior** in isolation.
 
 ### What Is Tested
 
@@ -187,21 +199,56 @@ Frontend tests focus on **user behavior and UI logic**, not internal implementat
 - Error handling without crashes
 - Standalone component behavior (no NgModules)
 
-### Why This Matters
-
-Most frontend bugs come from:
-- Incorrect state handling
-- Uncontrolled API calls
-- UI not updating after async operations
-
-These tests prevent those failures.
-
-### Run Frontend Tests
-
+### Run Frontend Unit Tests
+```bash
 cd frontend/careercraft
 npm test
+```
 
+---
 
+## E2E Tests (Cypress)
+
+E2E tests cover **full user flows** from the browser through to the API, testing every page of the application.
+
+### E2E Coverage
+
+| Page | What Is Tested |
+|------|----------------|
+| Home | Layout, navigation to all pages |
+| ATS Score | Valid input, loading state, button disabled, error handling |
+| Cover Letter | Valid input, loading state, button disabled, error handling |
+| Job Fit | Valid input, loading state, button disabled, error handling |
+| Skill Gap | Valid input, loading state, clear button, empty results |
+| Skill Recommendations | Valid input, loading state, no recommendations state |
+| Career Advice | Valid input, loading state, partial input validation |
+| Interview Questions | Valid input, loading state, empty results state |
+| Improve Bullet | Valid input, loading state, button disabled, error handling |
+| Resume Parser | PDF/DOCX upload, loading state, unsupported file type, error handling |
+| History | Empty state, populated after completed analysis |
+
+### E2E Test Patterns
+
+- **HTTP interception** — all API calls intercepted with `cy.intercept` to control responses
+- **Loading state assertions** — button disabled and loading message visible during requests
+- **Network delay simulation** — `res.setDelay()` forces async states to be testable
+- **Error handling** — 500 responses verified to trigger correct user-facing alerts
+- **Input validation** — empty and partial inputs verified to block submission
+- **Edge cases** — unsupported file types, empty API result arrays, zero scores
+
+### Run E2E Tests
+
+Requires both the frontend and backend to be running first.
+```bash
+# Open Cypress interactive UI
+npx cypress open
+
+# Run all tests headless
+npx cypress run
+
+# Run a single spec
+npx cypress run --spec "cypress/e2e/ats-score.cy.js"
+```
 
 ---
 
@@ -219,11 +266,7 @@ npm test
 - Resume Bullet Improvement
 - History Page
 
-All pages include:
-- Input validation
-- Loading states
-- Error handling
-- Consistent UX patterns
+All pages include input validation, loading states, error handling, and consistent UX patterns.
 
 ---
 
@@ -244,6 +287,4 @@ All pages include:
 - Export reports as PDF
 - Skill learning roadmaps
 - Cloud resume uploads
-
----
-
+- Cypress tests integrated into CI/CD pipeline
